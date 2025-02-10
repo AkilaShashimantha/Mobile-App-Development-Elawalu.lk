@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">PayHere AndroidSDK</string>
+
+    <!-- bottom sheet -->
+    <string name="credit_debit_card">Credit/Debit Card</string>
+    <string name="mobile_wallet">Mobile Wallet</string>
+    <string name="internet_banking">Internet banking</string>
+    <string name="payment_approved">Payment Approved</string>
+    <string name="payment_message">You\'ll receive an email with above Payment ID for further reference.</string>
+    <string name="reference_message">You\’ll receive an email with above Reference ID for further reference.</string>
+    <string name="window_close_msg">This secure payment window is closing in %d seconds…</string>
+    <string name="payment_reference">Payment ID #%s</string>
+    <string name="auto_reference">Reference ID #%s</string>
+    <string name="payment_method_title">SELECT A METHOD</string>
+    <string name="payment_result_title">THANK YOU!</string>
+    <string name="card_has_been_saved">Card saved</string>
+
+    <string name="msg_no_internet">No Internet Connection!</string>
+    <string name="hold_card_success_msg">You\'ll be charged once the merchant process this payment</string>
+
+    <string name="pay_with_text">Pay with</string>
+    <string name="pay_with_card_text">Bank Card</string>
+    <string name="pay_with_other_text">Other</string>
+    <string name="label_payment_approved">Payment Approved</string>
+    <string name="label_paid">Paid</string>
+    <string name="label_save">Saved</string>
+    <string name="label_declined">Declined</string>
+    <string name="label_declin_message">Your bank declined the payment</string>
+    <string name="decline_description_label">Please try again with a different card or method</string>
+    <string name="label_saved_message">Card Saved</string>
+</resources>

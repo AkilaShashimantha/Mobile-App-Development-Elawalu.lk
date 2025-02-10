@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bottom_sheet_title_back">#f6f8f9</color>
+    <color name="payment_item_back">#eef1f4</color>
+    <color name="bottom_sheet_back">#77000000</color>
+
+    <color name="text_bottom_sheet_title">#aaaaaa</color>
+    <color name="text_bottom_sheet_secured">#c3c3c4</color>
+    <color name="text_bottom_sheet_methods">#333333</color>
+    <color name="text_bottom_sheet_sub_title">#999999</color>
+    <color name="text_payment_important">#164df3</color>
+    <color name="progress_color">#777777</color>
+
+    <color name="title_text_color">#222222</color>
+
+    <color name="white">#ffffff</color>
+    <color name="result_dialog_subtitle_color">#585E64</color>
+    <color name="result_payment_id_background_color">#EFF1F4</color>
+    <color name="done_text_color">#0079FE</color>
+    <color name="color_red">#FF4043</color>
+</resources>
