@@ -18,7 +18,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class Payment_History extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
 
-
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
