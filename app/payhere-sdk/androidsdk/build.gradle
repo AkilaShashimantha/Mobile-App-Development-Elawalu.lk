@@ -1,0 +1,123 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+
+def sdk_group = "lk.payhere"
+def sdk_artifact_id = "androidsdk"
+def sdk_version = "3.0.18"
+
+android {
+    compileSdk 33
+
+    defaultConfig {
+
+        minSdkVersion 14
+        targetSdkVersion 33
+    }
+    buildTypes {
+        debug{
+            buildConfigField("String", "SDK_VERSION_CODE", "${defaultConfig.versionCode}")
+            buildConfigField("String","SDK_VERSION_NAME","${defaultConfig.versionName}")
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "SDK_VERSION_CODE", "${defaultConfig.versionCode}")
+            buildConfigField("String","SDK_VERSION_NAME","${defaultConfig.versionName}")
+        }
+    }
+    namespace 'lk.payhere.androidsdk'
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.3.0'
+
+    implementation 'com.github.bumptech.glide:glide:4.13.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'
+}
+
+//publishing {
+//    repositories {
+//        maven {
+//            name = 'Local'
+//            url = "file://${buildDir}/repo"
+//        }
+//        maven {
+//            name = "Repsy"
+//            url = uri("https://repo.repsy.io/mvn/payhere/payhere-mobilesdk-android")
+//            credentials {
+//                username = project.properties['repsy.user']
+//                password = project.properties['repsy.password']
+//            }
+//        }
+////        maven {
+////            name = "GitHubPackages"
+////            url = uri("https://maven.pkg.github.com/PayHereLK/payhere-mobilesdk-android")
+////            credentials {
+////                username = project.properties['github.user']
+////                password = project.properties['github.token']
+////            }
+////        }
+//    }
+//    publications {
+//        release(MavenPublication) {
+//            groupId "$sdk_group"
+//            artifactId "$sdk_artifact_id"
+//            version "$sdk_version"
+//            artifact("$buildDir/outputs/aar/androidsdk-release.aar")
+//
+//            pom.withXml {
+//                final dependenciesNode = asNode().appendNode('dependencies')
+//                ext.addDependency = { Dependency dep, String scope ->
+//                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+//                        return
+//                    final dependencyNode = dependenciesNode.appendNode('dependency')
+//                    dependencyNode.appendNode('groupId', dep.group)
+//                    dependencyNode.appendNode('artifactId', dep.name)
+//                    dependencyNode.appendNode('version', dep.version)
+//                    dependencyNode.appendNode('scope', scope)
+//                    if (!dep.transitive) {
+//                        final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+//                        exclusionNode.appendNode('groupId', '*')
+//                        exclusionNode.appendNode('artifactId', '*')
+//                    } else if (!dep.properties.excludeRules.empty) {
+//                        final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+//                        dep.properties.excludeRules.each { ExcludeRule rule ->
+//                            exclusionNode.appendNode('groupId', rule.group ?: '*')
+//                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
+//                        }
+//                    }
+//                }
+//                configurations.compile.getDependencies().each { dep -> addDependency(dep, "compile") }
+//                configurations.api.getDependencies().each { dep -> addDependency(dep, "compile") }
+//                configurations.implementation.getDependencies().each { dep -> addDependency(dep, "runtime") }
+//            }
+//        }
+//    }
+
+  afterEvaluate {
+      publishing {
+          publications {
+              release(MavenPublication){
+                  from components.release
+                  groupId "$sdk_group"
+                  artifactId "$sdk_artifact_id"
+                  version "$sdk_version"
+              }
+          }
+      }
+  }
+//}
