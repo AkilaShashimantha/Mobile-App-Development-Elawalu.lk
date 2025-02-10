@@ -1,6 +1,6 @@
 package com.example.mobileapp;
 
-package com.example.elawalu;
+
 
 import android.content.Intent;
 import android.graphics.Rect;
