@@ -1,6 +1,11 @@
 package com.example.mobileapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,60 +20,45 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-import android.content.Intent;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import android.widget.Toast;
-
-
-
-public class Login extends AppCompatActivity {
+public class SignUp extends AppCompatActivity {
 
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
+
+    private Button signUpBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_sign_up);
 
         getSupportActionBar().hide();
 
-        // Configure Google Sign-In
+        Button signUpBtn = findViewById(R.id.signUpBtn);
+        signUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SignUp.this,Login.class);
+                startActivity(intent);
+                finish();
+
+            }
+        });
+
+        // Configure Google Sign-Up
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        // Set up Google Sign-In button
+        // Set up Google Sign-Up button
 
-        ImageButton googleSignInBtn = findViewById(R.id.googleSignInBtn);
-        googleSignInBtn.setOnClickListener(view -> signIn());
+        ImageButton googleSignInBtn = findViewById(R.id.googleSignUpBtn);
+        googleSignInBtn.setOnClickListener(view -> signUp());
 
-        Button signInBtn = findViewById(R.id.button);
-//        signInBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(Login.this, Home.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//        });
 
-        Button button2 = findViewById(R.id.button2);
-        button2.setBackground(null);
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Login.this, SignUp.class);
-                startActivity(intent);
-                finish();
-            }
-        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -77,7 +67,7 @@ public class Login extends AppCompatActivity {
         });
     }
 
-    private void signIn() {
+    private void signUp() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -89,21 +79,21 @@ public class Login extends AppCompatActivity {
         // Result returned from launching the intent from GoogleSignInClient.getSignInIntent
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+            handleSignUpResult(task);
         }
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+    private void handleSignUpResult(Task<GoogleSignInAccount> completedTask) {
         try {
-            // Signed in successfully, get GoogleSignInAccount
+            // Signed Up successfully, get GoogleSignInAccount
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             String email = account.getEmail();
 
             // Display Toast message with the email
-            Toast.makeText(this, "Signed in as: " + email, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Signed Up as: " + email, Toast.LENGTH_SHORT).show();
 
-            // Navigate to HomeActivity
-          //  navigateToHome();
+            // Navigate to Login page
+            navigateToSignIn();
         } catch (ApiException e) {
             // Sign-in failed
             int statusCode = e.getStatusCode();
@@ -113,10 +103,10 @@ public class Login extends AppCompatActivity {
         }
     }
 
-//    private void navigateToHome() {
-//        Intent intent = new Intent(Login.this, Home.class);
-//        startActivity(intent);
-//        finish();
-//    }
+    private void navigateToSignIn() {
+        Intent intent = new Intent(SignUp.this, Login.class);
+        startActivity(intent);
+        finish();
+    }
 
 }
