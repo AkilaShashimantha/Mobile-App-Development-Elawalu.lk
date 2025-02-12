@@ -50,14 +50,14 @@ public class Login extends AppCompatActivity {
         googleSignInBtn.setOnClickListener(view -> signIn());
 
         Button signInBtn = findViewById(R.id.button);
-//        signInBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(Login.this, Home.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//        });
+        signInBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Login.this, Home.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         Button button2 = findViewById(R.id.button2);
         button2.setBackground(null);
@@ -103,7 +103,7 @@ public class Login extends AppCompatActivity {
             Toast.makeText(this, "Signed in as: " + email, Toast.LENGTH_SHORT).show();
 
             // Navigate to HomeActivity
-          //  navigateToHome();
+            navigateToHome();
         } catch (ApiException e) {
             // Sign-in failed
             int statusCode = e.getStatusCode();
@@ -113,10 +113,10 @@ public class Login extends AppCompatActivity {
         }
     }
 
-//    private void navigateToHome() {
-//        Intent intent = new Intent(Login.this, Home.class);
-//        startActivity(intent);
-//        finish();
-//    }
+    private void navigateToHome() {
+        Intent intent = new Intent(Login.this, Home.class);
+        startActivity(intent);
+        finish();
+    }
 
 }
