@@ -11,10 +11,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.UUID;
 
@@ -31,6 +37,11 @@ public class Payment extends AppCompatActivity {
     private Button paymentBtn;
     private TextView paymentStatus;
 
+    String userId;
+    String lastName, firstName, email,address,contactNumber,selectedLocation,selectedVegetable,quantity,price,advertismentCharge;
+    String payment,paymentFromAdvertisment,paymentFrom;
+
+
     @SuppressLint("MissingSuperCall")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +51,25 @@ public class Payment extends AppCompatActivity {
         // Hide the ActionBar for a cleaner UI (Optional)
         getSupportActionBar().hide();
 
+
+        Intent intent = getIntent();
+        userId = intent.getStringExtra("userId");
+        email = intent.getStringExtra("email");
+        firstName = intent.getStringExtra("fName");
+        lastName = intent.getStringExtra("lName");
+        selectedVegetable = intent.getStringExtra("selectedVegetable");
+        quantity = intent.getStringExtra("quantity");
+        selectedLocation = intent.getStringExtra("city");
+        contactNumber = intent.getStringExtra("contactNumber");
+        price = intent.getStringExtra("price");
+        address = intent.getStringExtra("address");
+        advertismentCharge = intent.getStringExtra("advertismentCharge");
+        paymentFromAdvertisment = intent.getStringExtra("paymentFromAdvertisment");
+
+        payment = advertismentCharge;
+
+        paymentFrom = paymentFromAdvertisment;
+
         // Initialize views
         paymentBtn = findViewById(R.id.paymentBtn);
         paymentStatus = findViewById(R.id.paymentStatus);
@@ -48,7 +78,7 @@ public class Payment extends AppCompatActivity {
         paymentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                initiatePayment();
+                initiatePayment(email,firstName,lastName,selectedLocation,contactNumber,address,payment,paymentFrom);
             }
         });
 
@@ -60,7 +90,7 @@ public class Payment extends AppCompatActivity {
         });
     }
 
-    private void initiatePayment() {
+    private void initiatePayment(String email, String firstName,String lastName, String city,String contactNumber, String address,String payment,String paymentFrom) {
         // Set the PayHere base URL for sandbox environment
         PHConfigs.setBaseUrl(PHConfigs.SANDBOX_URL);
 
@@ -68,19 +98,18 @@ public class Payment extends AppCompatActivity {
         InitRequest req = new InitRequest();
         req.setMerchantId("1229451");  // Replace with your PayHere Merchant ID
         req.setCurrency("LKR");  // Currency (LKR/USD/GBP/EUR)
-        req.setAmount(1000.00);   // Payment amount
+        req.setAmount(Double.parseDouble(payment)); // Payment amount
         req.setOrderId(UUID.randomUUID().toString());  // Unique Order ID
-        req.setItemsDescription("Test Item Purchase");  // Item description
-        req.setCustom1("Custom Message 1");
-        req.setCustom2("Custom Message 2");
+        req.setItemsDescription(paymentFrom);  // Item description
+
 
         // Customer Details
-        req.getCustomer().setFirstName("John");
-        req.getCustomer().setLastName("Doe");
-        req.getCustomer().setEmail("johndoe@gmail.com");
-        req.getCustomer().setPhone("+94771234567");
-        req.getCustomer().getAddress().setAddress("123, Sample Street");
-        req.getCustomer().getAddress().setCity("Colombo");
+        req.getCustomer().setFirstName(firstName);
+        req.getCustomer().setLastName(lastName);
+        req.getCustomer().setEmail(email);
+        req.getCustomer().setPhone(contactNumber);
+        req.getCustomer().getAddress().setAddress(address);
+        req.getCustomer().getAddress().setCity(city);
         req.getCustomer().getAddress().setCountry("Sri Lanka");
 
         // Backend URL to receive payment notifications
@@ -111,6 +140,7 @@ public class Payment extends AppCompatActivity {
                         paymentStatus.setText(message);
 
                         Intent intent = new Intent(Payment.this,Home.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();
 
@@ -118,6 +148,7 @@ public class Payment extends AppCompatActivity {
                         Log.e("PAYHERE", "paymentStatus is null!");
 
                         Intent intent = new Intent(Payment.this,Home.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();
 
@@ -125,6 +156,9 @@ public class Payment extends AppCompatActivity {
 
                     // Show success toast
                     Toast.makeText(this, "Payment Successful", Toast.LENGTH_LONG).show();
+
+                    saveItemToFirebase(userId, selectedVegetable, quantity, selectedLocation, contactNumber, price);
+
                 } else {
                     // Payment failed
                     if (paymentStatus != null) {
@@ -133,6 +167,7 @@ public class Payment extends AppCompatActivity {
                         Toast.makeText(this, "Payment Failed", Toast.LENGTH_LONG).show();
 
                         Intent intent = new Intent(Payment.this,Home.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();
 
@@ -144,6 +179,7 @@ public class Payment extends AppCompatActivity {
                     paymentStatus.setText("Payment Cancelled by User");
 
                     Intent intent = new Intent(Payment.this,Home.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();
 
@@ -151,4 +187,90 @@ public class Payment extends AppCompatActivity {
             }
         }
     }
+
+    private void saveItemToFirebase(String userId, String vegetable, String quantity, String location, String contactNumber, String price) {
+        // Reference to the user's Items node
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(userId)
+                .child("Items");
+
+        // Reference to the user's SellerPayments node
+        DatabaseReference sellerPaymentRef = FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(userId)
+                .child("ItemAdvertismentPayment");
+
+        // Generate a unique key for the item
+        String itemId = userRef.push().getKey();
+
+        // Get the current date and time
+        String currentDateTime = java.text.DateFormat.getDateTimeInstance().format(new java.util.Date());
+
+        // Create the Item object with activeStatus set to "1" and paymentDateTime set to the current date and time
+        Payment.Item item = new Payment.Item(vegetable, quantity, location, contactNumber, price, "1", currentDateTime);
+
+        // Save the item under the user's Items node
+        userRef.child(itemId).setValue(item)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(Payment.this, "Item saved successfully", Toast.LENGTH_SHORT).show();
+
+                            // Save a copy of the item under the user's SellerPayments node
+                            sellerPaymentRef.child(itemId).setValue(item)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Toast.makeText(Payment.this, "SellerPayment saved successfully", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Toast.makeText(Payment.this, "Failed to save SellerPayment", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+
+                        } else {
+                            Toast.makeText(Payment.this, "Failed to save item", Toast.LENGTH_SHORT).show();
+                            navigateToHome();
+                        }
+                    }
+                });
+    }
+
+
+    public static class Item {
+        public String vegetable;
+        public String quantity;
+        public String location;
+        public String contactNumber;
+        public String price;
+        public String activeStatus; // Add activeStatus field
+        public String paymentDateTime; // Add paymentDateTime field
+
+        // Default constructor required for Firebase
+        public Item() {}
+
+        // Constructor with activeStatus and paymentDateTime
+        public Item(String vegetable, String quantity, String location, String contactNumber, String price, String activeStatus, String paymentDateTime) {
+            this.vegetable = vegetable;
+            this.quantity = quantity;
+            this.location = location;
+            this.contactNumber = contactNumber;
+            this.price = price;
+            this.activeStatus = activeStatus; // Initialize activeStatus
+            this.paymentDateTime = paymentDateTime; // Initialize paymentDateTime
+        }
+    }
+
+
+    private void navigateToHome() {
+        Intent intent = new Intent(Payment.this, Home.class);
+        // Clear the back stack and start a new task
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
 }

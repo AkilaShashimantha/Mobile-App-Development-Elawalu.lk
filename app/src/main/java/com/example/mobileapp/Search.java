@@ -1,4 +1,4 @@
-package com.example.elawalu;
+package com.example.mobileapp;
 
 import android.content.Intent;
 import android.graphics.Rect;
@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mobileapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
@@ -123,7 +124,7 @@ public class Search extends AppCompatActivity {
             } else if (id == R.id.bottom_search) {
                 return true;
             } else if (id == R.id.bottom_Cart) {
-                startActivity(new Intent(getApplicationContext(), com.example.elawalu.View_Cart.class)
+                startActivity(new Intent(getApplicationContext(), com.example.mobileapp.View_Cart.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
                 return true;
             }

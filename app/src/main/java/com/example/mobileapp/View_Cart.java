@@ -1,5 +1,5 @@
-package com.example.elawalu;
 
+package com.example.mobileapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
